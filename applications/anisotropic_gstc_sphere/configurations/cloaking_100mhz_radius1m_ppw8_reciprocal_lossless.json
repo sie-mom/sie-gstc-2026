@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "application": "anisotropic_gstc_sphere",
+  "case_id": "cloaking_100mhz_radius1m_ppw8",
+  "physical": {
+    "frequency_hz": 100000000.0,
+    "radius_m": 1.0,
+    "interior": {"epsilon_r": 1.0, "mu_r": 1.0},
+    "exterior": {"epsilon_r": 1.0, "mu_r": 1.0}
+  },
+  "fields": {
+    "plane_x": {
+      "type": "plane_wave",
+      "electric_amplitude": {"real": [1.0, 0.0, 0.0], "imag": [0.0, 0.0, 0.0]},
+      "propagation_direction": [0.0, 0.0, 1.0]
+    },
+    "plane_y": {
+      "type": "plane_wave",
+      "electric_amplitude": {"real": [0.0, 1.0, 0.0], "imag": [0.0, 0.0, 0.0]},
+      "propagation_direction": [0.0, 0.0, 1.0]
+    }
+  },
+  "transformations": [
+    {"id": "plane_wave_x", "gstc": {"interior": null, "exterior": "plane_x"}},
+    {"id": "plane_wave_y", "gstc": {"interior": null, "exterior": "plane_y"}}
+  ],
+  "simulation": {
+    "cases": [
+      {"id": "plane_x_incidence", "excitations": [{"field": "plane_x", "region": "exterior"}]}
+    ]
+  },
+  "extraction_method": "reciprocal_lossless",
+  "tensor_structure": "general",
+  "sampling": {
+    "zx_grid_size": 100,
+    "zx_span_radii": 3.0,
+    "radial_points": 100,
+    "radial_theta_degrees": 45.0,
+    "radial_phi_degrees": 0.0,
+    "radial_min_radii": 0.05,
+    "radial_max_radii": 2.0
+  },
+  "sie": {
+    "mesh": {"path": "meshes/cloaking_100mhz_radius1m_ppw8/sphere.obj", "points_per_wavelength": 8.0},
+    "quadrature_rule": 17,
+    "singularity_threshold_lambda0": 0.1,
+    "compute_residual": true,
+    "evaluate_fields": true
+  }
+}

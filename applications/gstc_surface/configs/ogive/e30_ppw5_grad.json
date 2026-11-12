@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "application": "gstc_surface",
+  "case_id": "ogive",
+  "physical": {
+    "frequency_hz": 2000000000.0,
+    "interior": {
+      "epsilon_r": 5.0,
+      "mu_r": 1.0
+    },
+    "exterior": {
+      "epsilon_r": 1.0,
+      "mu_r": 1.0
+    }
+  },
+  "geometry": {
+    "type": "circular_ogive",
+    "max_radius_m": 0.1049273603,
+    "left_length_m": 0.13640556839,
+    "right_length_m": 0.13640556839,
+    "center_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "axis_direction": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  "fields": {
+    "electric_z_interior": {
+      "type": "dipole",
+      "dipole_type": "electric",
+      "effective_moment": {
+        "real": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "imag": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "source_position": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "electric_z_exterior": {
+      "type": "dipole",
+      "dipole_type": "electric",
+      "effective_moment": {
+        "real": [
+          0.0,
+          0.0,
+          7.476743906106103
+        ],
+        "imag": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "source_position": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "electric_y_interior": {
+      "type": "dipole",
+      "dipole_type": "electric",
+      "effective_moment": {
+        "real": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "imag": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "source_position": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "electric_y_exterior": {
+      "type": "dipole",
+      "dipole_type": "electric",
+      "effective_moment": {
+        "real": [
+          0.0,
+          7.476743906106103,
+          0.0
+        ],
+        "imag": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "source_position": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "transformations": [
+    {
+      "id": "electric_z_matching",
+      "gstc": {
+        "interior": "electric_z_interior",
+        "exterior": "electric_z_exterior"
+      }
+    },
+    {
+      "id": "electric_y_matching",
+      "gstc": {
+        "interior": "electric_y_interior",
+        "exterior": "electric_y_exterior"
+      }
+    }
+  ],
+  "simulation": {
+    "cases": [
+      {
+        "id": "electric_z_incidence",
+        "excitations": [
+          {
+            "field": "electric_z_interior",
+            "region": "interior"
+          }
+        ]
+      },
+      {
+        "id": "electric_y_incidence",
+        "excitations": [
+          {
+            "field": "electric_y_interior",
+            "region": "interior"
+          }
+        ]
+      }
+    ]
+  },
+  "extraction_method": "reciprocal_lossless",
+  "tensor_structure": "general",
+  "sampling": {
+    "zx_grid_size": 200,
+    "zx_x_limits_m": [
+      -0.16788377648,
+      0.16788377648
+    ],
+    "zx_z_limits_m": [
+      -0.16788377648,
+      0.16788377648
+    ],
+    "radial_points": 300,
+    "radial_theta_degrees": 45.0,
+    "radial_phi_degrees": 0.0,
+    "radial_min_m": 0.004,
+    "radial_max_m": 0.16788377648
+  },
+  "sie": {
+    "mesh": {
+      "path": "meshes/ogive/e30_ppw5_grad.obj",
+      "points_per_wavelength": 5.0,
+      "tip_grading": {
+        "size_factor": 0.5,
+        "region_fraction": 0.25
+      }
+    },
+    "quadrature_rule": 7,
+    "singularity_threshold_lambda0": 0.1,
+    "basis": "face",
+    "compute_residual": true,
+    "evaluate_fields": true
+  }
+}

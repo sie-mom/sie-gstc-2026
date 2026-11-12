@@ -1,0 +1,5 @@
+add_executable(anisotropic_sphere_app anisotropic_sphere_app.cpp)
+target_link_libraries(anisotropic_sphere_app PRIVATE sie_mom)
+
+add_executable(anisotropic_surface_sampler experiments/sample_surface_fields.cpp)
+target_link_libraries(anisotropic_surface_sampler PRIVATE sie_mom)

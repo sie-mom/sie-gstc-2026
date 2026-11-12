@@ -1,0 +1,74 @@
+# Builds the Sphinx + Doxygen documentation in docs/ and deploys it to GitHub Pages
+name: Deploy Sphinx docs to GitHub Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  pull_request:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies (Doxygen + LaTeX for imgmath/tikz)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen texlive-latex-extra texlive-fonts-recommended dvisvgm ghostscript libglu1-mesa
+
+      - name: Install Python dependencies
+        run: pip install -e ".[docs,mesh]"
+
+      - name: Build documentation
+        working-directory: docs
+        run: make html SPHINXBUILD=sphinx-build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/build/html
+
+  # Deployment job
+  # Only runs when the repo variable DOCS_PUBLISH is set to "true"
+  # (Settings -> Secrets and variables -> Actions -> Variables).
+  # The build job above still runs on every push so you can catch build
+  # breakage even while publishing is switched off.
+  deploy:
+    if: github.event_name != 'pull_request' && vars.DOCS_PUBLISH == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

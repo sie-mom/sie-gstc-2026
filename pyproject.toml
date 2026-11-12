@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sie_mom"
+version = "0.0.1"
+description = "Surface integral equation and method of moments solvers for GSTC metasurfaces"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [ { name = "German Farinas Perez", email = "germanf@vt.edu" } ]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+cuda12 = ["cupy-cuda12x>=13.0.0; platform_system == 'Linux'"]
+cuda13 = ["cupy-cuda13x>=13.0.0; platform_system == 'Linux'"]
+dev = [
+  "pandas>=2.2",
+  "pytest>=8.0",
+  "ruff>=0.5.0",
+  "mypy>=1.10",
+  "tox>=4.0",
+]
+docs = [
+  "sphinx",
+  "sphinx-book-theme",
+  "breathe",
+  "sphinxcontrib-tikz",
+  "sphinxcontrib-bibtex",
+]
+mesh = [
+  "gmsh",
+]
+comsol = [
+  "mph>=1.4,<2",
+]
+ngsolve = [
+  "ngsolve==6.2.2608",
+  "mkl>=2024",
+  "intel-openmp>=2024",
+]
+plot = [
+  "matplotlib>=3.8",
+]
+sampling = [
+  "trimesh>=4,<6",
+  "rtree>=1,<2",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/sie-mom/sie-gstc-2026"
+Repository = "https://github.com/sie-mom/sie-gstc-2026"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}

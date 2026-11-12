@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "application": "dipole_impedance_matching",
+  "case_id": "budhu_10ghz_eps7_cap5_ppw9",
+  "physical": {
+    "frequency_hz": 10000000000.0,
+    "radius_lambda0": 0.7,
+    "interior": {"epsilon_r": 7.0, "mu_r": 1.0},
+    "exterior": {"epsilon_r": 1.0, "mu_r": 1.0},
+    "source": {"effective_moment_interior": 1.0}
+  },
+  "extraction_method": "least_squares",
+  "cap_perturbation": {
+    "theta_degrees": 90.0,
+    "phi_degrees": 0.0,
+    "angular_radius_degrees": 5.0,
+    "parameter_scale": 0.1
+  },
+  "svwf": {"n_max": 36, "n_theta": 91, "n_phi": 180},
+  "sie": {
+    "mesh": {
+      "path": "meshes/budhu_10ghz_eps7_cap5_ppw9/sphere.obj",
+      "points_per_wavelength": 9.0
+    },
+    "quadrature_rule": 7,
+    "solver": "dense_lu",
+    "scaling": "eta0"
+  },
+  "sampling": {
+    "zx_grid_size": 200,
+    "zx_span_radii": 2.0,
+    "radial_points": 300,
+    "radial_theta_degrees": 45.0,
+    "radial_phi_degrees": 0.0,
+    "radial_min_radii": 0.05,
+    "radial_max_radii": 2.0
+  }
+}

@@ -1,0 +1,2 @@
+add_executable(pec_sphere_app pec_sphere_app.cpp)
+target_link_libraries(pec_sphere_app PRIVATE sie_mom)

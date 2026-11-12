@@ -1,0 +1,2 @@
+add_executable(evaluate_surface_fields evaluate_surface_fields.cpp)
+target_link_libraries(evaluate_surface_fields PRIVATE sie_mom)

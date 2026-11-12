@@ -1,0 +1,3 @@
+# Keep generated runs local while preserving this directory in Git.
+/*
+!/.gitignore

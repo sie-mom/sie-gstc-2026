@@ -1,0 +1,4 @@
+# Minimal Ruff configuration
+line-length = 100
+select = ["E", "F", "I"]  # E/F = pyflakes/pycodestyle, I = import sort
+ignore = []

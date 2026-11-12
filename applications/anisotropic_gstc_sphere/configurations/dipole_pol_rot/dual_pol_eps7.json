@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "application": "anisotropic_gstc_sphere",
+  "case_id": "dual_pol_eps7",
+  "physical": {
+    "frequency_hz": 10000000000.0,
+    "radius_m": 0.020985472064208477,
+    "interior": {
+      "epsilon_r": 7.0,
+      "mu_r": 1.0
+    },
+    "exterior": {
+      "epsilon_r": 1.0,
+      "mu_r": 1.0
+    }
+  },
+  "fields": {
+    "electric_z_interior": {
+      "type": "dipole",
+      "dipole_type": "electric",
+      "effective_moment": {
+        "real": [0.0, 0.0, 1.0],
+        "imag": [0.0, 0.0, 0.0]
+      },
+      "source_position": [0.0, 0.0, 0.0]
+    },
+    "magnetic_z_exterior": {
+      "type": "dipole",
+      "dipole_type": "magnetic",
+      "effective_moment": {
+        "real": [0.0, 0.0, 11.386035931884505],
+        "imag": [0.0, 0.0, 0.0]
+      },
+      "source_position": [0.0, 0.0, 0.0]
+    },
+    "magnetic_z_interior": {
+      "type": "dipole",
+      "dipole_type": "magnetic",
+      "effective_moment": {
+        "real": [0.0, 0.0, 1.0],
+        "imag": [0.0, 0.0, 0.0]
+      },
+      "source_position": [0.0, 0.0, 0.0]
+    },
+    "electric_z_exterior": {
+      "type": "dipole",
+      "dipole_type": "electric",
+      "effective_moment": {
+        "real": [0.0, 0.0, 11.386035931884505],
+        "imag": [0.0, 0.0, 0.0]
+      },
+      "source_position": [0.0, 0.0, 0.0]
+    }
+  },
+  "transformations": [
+    {
+      "id": "electric_to_magnetic",
+      "gstc": {
+        "interior": "electric_z_interior",
+        "exterior": "magnetic_z_exterior"
+      }
+    },
+    {
+      "id": "magnetic_to_electric",
+      "gstc": {
+        "interior": "magnetic_z_interior",
+        "exterior": "electric_z_exterior"
+      }
+    }
+  ],
+  "simulation": {
+    "cases": [
+      {
+        "id": "electric_incidence",
+        "excitations": [
+          {
+            "field": "electric_z_interior",
+            "region": "interior"
+          }
+        ]
+      },
+      {
+        "id": "magnetic_incidence",
+        "excitations": [
+          {
+            "field": "magnetic_z_interior",
+            "region": "interior"
+          }
+        ]
+      }
+    ]
+  },
+  "extraction_method": "reciprocal_lossless",
+  "tensor_structure": "general",
+  "sampling": {
+    "zx_grid_size": 200,
+    "zx_span_radii": 2.0,
+    "radial_points": 300,
+    "radial_theta_degrees": 45.0,
+    "radial_phi_degrees": 0.0,
+    "radial_min_radii": 0.05,
+    "radial_max_radii": 2.0
+  },
+  "sie": {
+    "mesh": {
+      "path": "meshes/example_1_omega_matching_10ghz_eps7/sphere_ppw6.obj",
+      "points_per_wavelength": 6.0
+    },
+    "quadrature_rule": 7,
+    "singularity_threshold_lambda0": 0.1,
+    "compute_residual": true,
+    "evaluate_fields": true
+  }
+}

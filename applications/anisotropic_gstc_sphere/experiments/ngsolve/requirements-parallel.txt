@@ -1,0 +1,3 @@
+# Optional runtime PARDISO support; install into this experiment's environment.
+mkl==2026.2.0
+threadpoolctl==3.7.0

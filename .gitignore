@@ -1,0 +1,100 @@
+# Python build / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+.env
+.env.*
+
+# Packaging / distribution
+build/
+/build-tinkercliffs-*/
+dist/
+*.egg-info/
+.eggs/
+
+# C extensions
+*.so
+
+# Logs / debug
+*.log
+/slurm-*.out
+/slurm-*.err
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+presentations/group_meetings/**/build/
+
+# IDE/editor
+#
+.idea/
+*.swp
+*.swo
+
+# Testing
+.htmlcov/
+.tox/
+.pytest_cache/
+.coverage*
+coverage.xml
+tests/python/data/eh_total_2d_cut_gstc.csv
+tests/python/plots/*.png
+
+# Type checking / lint
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Jupyter / notebooks
+.ipynb_checkpoints/
+
+# Misc
+.DS_Store
+Thumbs.db
+
+# Local data / scratch
+/tmp/
+/.dvc/
+*.local*
+
+# Application output / generated data
+applications/pmchwt_dielectric_sphere/results/
+tests/cpp/edge_duffy_reference_test.cpp
+
+applications/cone_sphere/plots/
+applications/cone_sphere/data/
+applications/nose_cone_sphere/plots/
+applications/nose_cone_sphere/data/
+applications/pec_sphere/plots/
+applications/pec_sphere/data/
+applications/pec_sphere/results/
+applications/pmchwt_dielectric_sphere/results/
+applications/cloaking_gstc_sphere/plots
+applications/cloaking_gstc_sphere/data/**
+!applications/cloaking_gstc_sphere/data/README.md
+!applications/cloaking_gstc_sphere/data/**/.gitkeep
+applications/omega_biisotropic_sphere/results/
+applications/anisotropic_gstc_sphere/results
+
+# Documentation build artifacts
+/docs/_build/
+/docs/build/
+/docs/html/
+/docs/latex/
+.git_backup/
+**/.comsol_runtime/

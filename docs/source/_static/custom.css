@@ -1,0 +1,29 @@
+/* imgmath wraps each display equation in a paragraph. The theme's outer
+ * row-reverse flex layout assumes MathJax markup and right-aligns that wrapper.
+ * Lay out the image and its optional equation number inside the paragraph.
+ */
+.bd-article div.math {
+    display: block;
+    overflow-x: auto;
+    padding-block: 0.25rem;
+}
+
+.bd-article div.math > p {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 1rem;
+    width: max-content;
+    min-width: 100%;
+    margin: 0;
+}
+
+.bd-article div.math > p > img {
+    flex: 0 0 auto;
+    max-width: none;
+    margin-inline: auto;
+}
+
+.bd-article div.math > p > .eqno {
+    flex: 0 0 auto;
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "application": "anisotropic_gstc_sphere",
+  "case_id": "refl_complex",
+  "physical": {
+    "frequency_hz": 100000000.0,
+    "radius_m": 2.0,
+    "interior": {"epsilon_r": 1.0, "mu_r": 1.0},
+    "exterior": {"epsilon_r": 1.0, "mu_r": 1.0}
+  },
+  "fields": {
+    "electric_z_shifted": {
+      "type": "dipole",
+      "dipole_type": "electric",
+      "effective_moment": {"real": [0.0, 0.0, 1.0], "imag": [0.0, 0.0, 0.0]},
+      "source_position": [0.0, 0.0, 0.5]
+    },
+    "electric_z_centered": {
+      "type": "dipole",
+      "dipole_type": "electric",
+      "effective_moment": {"real": [0.0, 0.0, 1.0], "imag": [0.0, 0.0, 0.0]},
+      "source_position": [0.0, 0.0, 0.0]
+    },
+    "magnetic_z_centered": {
+      "type": "dipole",
+      "dipole_type": "magnetic",
+      "effective_moment": {"real": [0.0, 0.0, 1.0], "imag": [0.0, 0.0, 0.0]},
+      "source_position": [0.0, 0.0, 0.0]
+    },
+    "magnetic_z_centered_half": {
+      "type": "dipole",
+      "dipole_type": "magnetic",
+      "effective_moment": {"real": [0.0, 0.0, 0.5], "imag": [0.0, 0.0, 0.0]},
+      "source_position": [0.0, 0.0, 0.0]
+    }
+  },
+  "transformations": [
+    {
+      "id": "electric_displacement",
+      "gstc": {"interior": "electric_z_shifted", "exterior": "electric_z_centered"}
+    },
+    {
+      "id": "magnetic_attenuation",
+      "gstc": {"interior": "magnetic_z_centered", "exterior": "magnetic_z_centered_half"}
+    }
+  ],
+  "simulation": {
+    "cases": [
+      {
+        "id": "electric_incidence",
+        "excitations": [{"field": "electric_z_shifted", "region": "interior"}]
+      },
+      {
+        "id": "magnetic_incidence",
+        "excitations": [{"field": "magnetic_z_centered", "region": "interior"}]
+      }
+    ]
+  },
+  "extraction_method": "reciprocal_complex",
+  "tensor_structure": "general",
+  "sampling": {
+    "zx_grid_size": 200,
+    "zx_span_radii": 3.0,
+    "radial_points": 200,
+    "radial_theta_degrees": 45.0,
+    "radial_phi_degrees": 0.0,
+    "radial_min_radii": 0.05,
+    "radial_max_radii": 2.0
+  },
+  "sie": {
+    "mesh": {"path": "meshes/reflectionless_100mhz_radius2m_ppw10/sphere.obj", "points_per_wavelength": 10.0},
+    "quadrature_rule": 17,
+    "singularity_threshold_lambda0": 0.1,
+    "compute_residual": true,
+    "evaluate_fields": true
+  }
+}
+
