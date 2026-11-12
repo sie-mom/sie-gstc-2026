@@ -45,7 +45,7 @@ jobs:
 
       - name: Build documentation
         working-directory: docs
-        run: make html SPHINXBUILD=sphinx-build
+        run: make html SPHINXBUILD=sphinx-build SPHINXOPTS="-W -D suppress_warnings=toc.not_included"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -61,37 +61,37 @@ This section documents the helper functions used by the main CUDA kernels. They 
 Mesh Geometry
 ^^^^^^^^^^^^^
 
-.. doxygenfile:: include/sie_mom/cuda/mesh_geometry.cuh
+.. doxygenfile:: mesh_geometry.cuh
    :project: sie_mom
 
 Semi-Analytic Integration
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. doxygenfile:: include/sie_mom/cuda/semi_analytic_integrals.cuh
+.. doxygenfile:: semi_analytic_integrals.cuh
    :project: sie_mom
 
 Standard Quadrature
 ^^^^^^^^^^^^^^^^^^^
 
-.. doxygenfile:: include/sie_mom/cuda/dunavant_quadrature.cuh
+.. doxygenfile:: dunavant_quadrature.cuh
    :project: sie_mom
 
 Math Utilities
 ^^^^^^^^^^^^^^
 
-.. doxygenfile:: include/sie_mom/cuda/math_utils.cuh
+.. doxygenfile:: math_utils.cuh
    :project: sie_mom
 
 RWG Basis Functions Utilities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. doxygenfile:: include/sie_mom/cuda/rwg_basis_utils.cuh
+.. doxygenfile:: rwg_basis_utils.cuh
    :project: sie_mom
 
 Green's Function Utilities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. doxygenfile:: include/sie_mom/cuda/green_functions_utils.cuh
+.. doxygenfile:: green_functions_utils.cuh
    :project: sie_mom
 
 GSTC Tensor & Basis Utilities
