@@ -39,10 +39,25 @@ Gmsh Mesh Generators
 --------------------
 
 .. automodule:: sie_mom.mesh.mesh_generators
-   :members: BaseGmshGenerator, SphereGenerator, ConeSphereGenerator, BluntedConeSphereGenerator, CommonMeshOptions
+   :members: BaseGmshGenerator, SphereGenerator, ConeSphereGenerator, BluntedConeSphereGenerator, CircularOgiveGenerator, CommonMeshOptions
    :show-inheritance:
 
 .. automethod:: sie_mom.mesh.mesh_generators.BaseGmshGenerator.generate
+
+
+Circular Ogive Geometry and Tip Grading
+---------------------------------------
+
+The circular-arc spindle in publication Example 3 uses
+:class:`~sie_mom.mesh.mesh_generators.CircularOgiveGenerator` with
+:class:`~sie_mom.mesh.circular_ogive.CircularOgive` geometry and optional
+:class:`~sie_mom.mesh.circular_ogive.OgiveTipGrading` for local tip refinement.
+Call the inherited :meth:`~sie_mom.mesh.mesh_generators.BaseGmshGenerator.generate`
+method to generate and export the mesh.
+
+.. automodule:: sie_mom.mesh.circular_ogive
+   :members: CircularOgive, OgiveTipGrading
+   :show-inheritance:
 
 
 Python Mesh & Face Frames
