@@ -75,9 +75,26 @@ Or via Python:
 
 ---
 
-### Generating Figures Only (from existing simulation data)
+### Regenerating the publication figures
 
-To regenerate or re-style figures without touching the solvers:
+For a fresh checkout, use the `run_example_2_part_a.py` and
+`run_example_2_part_b.py` commands above. They coordinate the SIE simulations,
+SVWF benchmarks, figures, and surface-parameter plots.
+
+When SIE results already exist, regenerate all field figures with:
+
+```bash
+.venv/bin/python applications/anisotropic_gstc_sphere/publication/run_example_2_part_a.py --plots-only --skip-parameters
+.venv/bin/python applications/anisotropic_gstc_sphere/publication/run_example_2_part_b.py --plots-only --skip-parameters
+```
+
+These commands skip the C++ SIE solve, generate any missing SVWF benchmark,
+and call the plotting scripts. Existing SVWF files are reused.
+`--skip-parameters` skips the separate surface-parameter figures; omit it
+if those should also be regenerated.
+
+For styling changes when the SIE and SVWF CSV files are already available,
+run the plotting scripts directly. They only read existing data and save figures:
 ```bash
 # Part A:
 .venv/bin/python applications/anisotropic_gstc_sphere/publication/plot_example_2_part_a.py
@@ -96,7 +113,7 @@ Both runners and plotting scripts support:
 * `--cmap <str>`: Colormap for 2D field maps (default: `viridis`; options include `turbo`, `inferno`, `plasma`).
 * `--dpi <int>`: PNG output resolution (default: `300`).
 * `--force` *(runner only)*: Clean existing simulation directory and re-run C++ SIE solve from scratch.
-* `--plots-only` *(runner only)*: Skip solver runs and only render the figures.
+* `--plots-only` *(runner only)*: Skip the C++ SIE solve, generate any missing SVWF benchmarks, and regenerate figures from existing SIE results.
 * `--skip-parameters` *(runner only)*: Skip metasurface constitutive parameter postprocessing plots.
 
 #### Recommended Colorbar Dynamic Ranges:
@@ -118,16 +135,16 @@ All publication figures are saved to `applications/anisotropic_gstc_sphere/publi
 
 ### Part A Figures
 * `figure_1_part_a_2d_field_maps.pdf / .png`: 2-panel 2D map ($|E_\theta|$ TM vs. $|E_\phi|$ TE).
-* `figure_2_part_a_radial_cut_transformation.pdf / .png`: 1D radial cut (Target vs. SIE vs. SVWF).
+* `figure_2_part_a_radial_cut_transformation.pdf / .png`: Two stacked full-range radial cuts: $\operatorname{Re}(E_\theta)$ above and $\operatorname{Re}(E_\phi)$ below (Target vs. SIE vs. SVWF).
 * `surface_parameters/`: Constitutive tensor maps ($\mathbf{Y}_{ee}, \mathbf{Z}_{mm}, \boldsymbol{\chi}$) and condition number $\kappa(M)$.
 
 ### Part B Figures
 * `figure_1_part_b_magnetic_incidence_2d_field_maps.pdf / .png`: Individual 2D map for Case 2 ($|E_\phi|$ TE interior vs. $|E_\theta|$ TM exterior, calibrated `[-100, -40] dB`).
 * `figure_1_part_b_electric_incidence_2d_field_maps.pdf / .png`: Individual 2D map for Case 1 ($|E_\theta|$ TM interior vs. $|E_\phi|$ TE exterior, `[-112, -58] dB`).
 * `figure_1_part_b_combined_2d_field_maps.pdf / .png`: Comprehensive 4-panel (2x2) dual comparison showcasing both cases and full field duality.
-* `figure_2_part_b_magnetic_incidence_radial_cut.pdf / .png`: Individual 1D radial cut for Case 2 properly framed to $[-30, +10]\times 10^5\text{ V/m}$.
-* `figure_2_part_b_electric_incidence_radial_cut.pdf / .png`: Individual 1D radial cut for Case 1 properly framed to $[-8, +18]\times 10^5\text{ V/m}$.
-* `figure_2_part_b_radial_cut_transformation.pdf / .png`: Side-by-side 2-panel 1D radial cut comparing Case 1 and Case 2 against Target, SIE, and SVWF.
+* `figure_2_part_b_magnetic_incidence_radial_cut.pdf / .png`: Two stacked full-range radial cuts for Case 2: $\operatorname{Re}(E_\theta)$ above and $\operatorname{Re}(E_\phi)$ below, with independent vertical limits.
+* `figure_2_part_b_electric_incidence_radial_cut.pdf / .png`: Two stacked full-range radial cuts for Case 1: $\operatorname{Re}(E_\theta)$ above and $\operatorname{Re}(E_\phi)$ below.
+* `figure_2_part_b_radial_cut_transformation.pdf / .png`: Four-panel comparison against Target, SIE, and SVWF. Columns are electric and magnetic incidence; rows are $\operatorname{Re}(E_\theta)$ and $\operatorname{Re}(E_\phi)$ across both regions.
 * `surface_parameters_part_b/`: Dual metasurface constitutive parameter maps ($\mathbf{Y}_{ee}, \mathbf{Z}_{mm}, \boldsymbol{\chi}$) and condition number $\kappa(M)$.
 
 * **Figure 1: 2D Field Maps ($|E_\theta|$ vs. $|E_\phi|$)**:
@@ -137,10 +154,10 @@ All publication figures are saved to `applications/anisotropic_gstc_sphere/publi
   * Files: `figure_1_part_a_2d_field_maps.pdf` and `figure_1_part_a_2d_field_maps.png`.
 
 * **Figure 2: 1D Radial Cut Transformation ($\theta = 45^\circ, \phi = 0^\circ$)**:
-  * Unified piecewise radial representation:
-    - $r/a \le 1.0$: $\operatorname{Re}(E_\theta)$ (dominant TM mode).
-    - $r/a > 1.0$: $\operatorname{Re}(E_\phi)$ (dominant TE mode).
-  * Curves: Prescribed Target (black solid), SIE-GSTC MoM (orange dashed), and SVWF Collocation (green dotted).
+  * Two stacked panels over the full range $r/a \in [0.1, 2.0]$:
+    - Top: $\operatorname{Re}(E_\theta)$ in both regions.
+    - Bottom: $\operatorname{Re}(E_\phi)$ in both regions.
+  * Curves: Prescribed Target (black dashed), SIE-GSTC MoM (orange circles), and SVWF Collocation (green triangles, when available). A red dashed line marks $r/a=1$ in each panel.
   * Physical Scale: Scaled to Budhu dipole moment ($I\Delta z = 1\text{ A}\cdot\text{m}$, plotted as $\times 10^5\text{ V/m}$).
   * Files: `figure_2_part_a_radial_cut_transformation.pdf` and `figure_2_part_a_radial_cut_transformation.png`.
 

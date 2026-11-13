@@ -14,9 +14,9 @@ Generates:
      - figure_1_part_b_case2_magnetic_incidence_2d_field_maps.pdf / .png
      - figure_1_part_b_combined_2d_field_maps.pdf / .png (4-panel dual comparison)
   2. 1D Radial Cuts:
-     - figure_2_part_b_case1_electric_incidence_radial_cut.pdf / .png
-     - figure_2_part_b_case2_magnetic_incidence_radial_cut.pdf / .png
-     - figure_2_part_b_radial_cut_transformation.pdf / .png (2-panel dual comparison)
+     - figure_2_part_b_electric_incidence_radial_cut.pdf / .png (two stacked components)
+     - figure_2_part_b_magnetic_incidence_radial_cut.pdf / .png (two stacked components)
+     - figure_2_part_b_radial_cut_transformation.pdf / .png (2x2 component/case comparison)
 
 Designed for IEEE journal formatting (3.5 in single column, 7.1 in double column).
 """
@@ -290,7 +290,7 @@ def plot_combined_4panel_2d_maps(
 
 
 def _extract_1d_radial_curves(results_dir: Path, config: object, case_name: str):
-    """Extract Target, SIE, and SVWF 1D radial curves for a given case."""
+    """Extract both tangential components over the full radial cut for each method."""
     radius_m = config.case.radius_m
     fields_dir = results_dir / "cases" / case_name / "fields"
     sie_csv = fields_dir / "sie_physical_radial.csv"
@@ -367,7 +367,6 @@ def _extract_1d_radial_curves(results_dir: Path, config: object, case_name: str)
         ref_ext = config.fields["electric_z_exterior"]
 
     from sie_mom.excitation import evaluate_dipole_fields
-    scale_tgt = scale
 
     # Interior target
     m_int = tuple(x.real for x in ref_int.effective_moment)
@@ -384,51 +383,46 @@ def _extract_1d_radial_curves(results_dir: Path, config: object, case_name: str)
         dipole_type=ref_ext.dipole_type,
     )
 
-    # Piecewise curve construction:
-    # Case 1 (electric): int is Eth, ext is Eph
-    # Case 2 (magnetic): int is Eph, ext is Eth
-    target_curve = np.zeros(len(r_norm))
-    sie_curve = np.zeros(len(r_norm))
-    svwf_curve = np.zeros(len(r_norm)) if has_svwf else None
-    comsol_curve = np.zeros(len(r_norm_comsol)) if has_comsol else None
-
-    if case_name == "electric_incidence":
-        target_curve[int_mask] = (E_tgt_int[1] * scale_tgt).real
-        target_curve[ext_mask] = (E_tgt_ext[2] * scale_tgt).real
-        sie_curve[int_mask] = Eth_sie[int_mask].real
-        sie_curve[ext_mask] = Eph_sie[ext_mask].real
-        if has_svwf:
-            svwf_curve[int_mask] = Eth_svwf[int_mask].real
-            svwf_curve[ext_mask] = Eph_svwf[ext_mask].real
-        if has_comsol:
-            c_int = r_norm_comsol <= 1.0
-            c_ext = r_norm_comsol > 1.0
-            comsol_curve[c_int] = Eth_comsol[c_int].real
-            comsol_curve[c_ext] = Eph_comsol[c_ext].real
-    else:
-        target_curve[int_mask] = (E_tgt_int[2] * scale_tgt).real
-        target_curve[ext_mask] = (E_tgt_ext[1] * scale_tgt).real
-        sie_curve[int_mask] = Eph_sie[int_mask].real
-        sie_curve[ext_mask] = Eth_sie[ext_mask].real
-        if has_svwf:
-            svwf_curve[int_mask] = Eph_svwf[int_mask].real
-            svwf_curve[ext_mask] = Eth_svwf[ext_mask].real
-        if has_comsol:
-            c_int = r_norm_comsol <= 1.0
-            c_ext = r_norm_comsol > 1.0
-            comsol_curve[c_int] = Eph_comsol[c_int].real
-            comsol_curve[c_ext] = Eth_comsol[c_ext].real
+    # Keep both components over the full cut for individual and combined plots.
+    target_components = np.empty((2, len(r_norm)))
+    target_components[:, int_mask] = np.real(scale * E_tgt_int[1:3])
+    target_components[:, ext_mask] = np.real(scale * E_tgt_ext[1:3])
 
     return {
+        "target_components": target_components,
+        "sie_components": np.real(np.array([Eth_sie, Eph_sie])),
+        "svwf_components": np.real(np.array([Eth_svwf, Eph_svwf])) if has_svwf else None,
+        "comsol_components": np.real(np.array([Eth_comsol, Eph_comsol])) if has_comsol else None,
         "r_norm": r_norm,
-        "target": target_curve,
-        "sie": sie_curve,
-        "svwf": svwf_curve,
-        "comsol": comsol_curve,
         "r_norm_comsol": r_norm_comsol,
         "has_svwf": has_svwf,
         "has_comsol": has_comsol,
     }
+
+
+def _plot_radial_component(ax, curves, component: int) -> None:
+    """Draw one full-range component (0: theta, 1: phi) with shared method styling."""
+    r_norm = curves["r_norm"]
+    visible = (r_norm >= 0.1) & (r_norm <= 2.0)
+    r_plot = r_norm[visible]
+    ax.plot(r_plot, curves["target_components"][component, visible] / 1e5,
+            color="black", linestyle="--", linewidth=1.0, label="Prescribed Target")
+    ax.plot(r_plot, curves["sie_components"][component, visible] / 1e5,
+            color="#d95f02", linestyle="none", marker="o", markevery=(0, 10),
+            markersize=3.0, markerfacecolor="none", markeredgewidth=0.8, label="SIE-GSTC (MoM)")
+    if curves["has_svwf"]:
+        ax.plot(r_plot, curves["svwf_components"][component, visible] / 1e5,
+                color="#1b9e77", linestyle="none", marker="^", markevery=(5, 24),
+                markersize=3.0, markerfacecolor="none", markeredgewidth=0.8, label="SVWF Collocation")
+    if curves["has_comsol"]:
+        visible_comsol = (curves["r_norm_comsol"] >= 0.1) & (curves["r_norm_comsol"] <= 2.0)
+        ax.plot(curves["r_norm_comsol"][visible_comsol], curves["comsol_components"][component, visible_comsol] / 1e5,
+                color="#0072B2", linestyle="-.", linewidth=0.8, label="COMSOL (FEM)")
+    ax.axvline(1.0, color="#e41a1c", linestyle="--", linewidth=0.8, alpha=0.7)
+    ax.set_ylabel((r"$\mathrm{Re}(E_\theta)$ [$10^5$ V/m]",
+                   r"$\mathrm{Re}(E_\phi)$ [$10^5$ V/m]")[component])
+    ax.set_xlim(0.1, 2.0)
+    ax.grid(True, linestyle=":", alpha=0.6)
 
 
 def plot_single_case_1d_radial_cut(
@@ -439,55 +433,18 @@ def plot_single_case_1d_radial_cut(
     *,
     dpi: int = 300,
 ) -> tuple[Path, Path]:
-    """Plot 1D radial cut piecewise transformation for one case."""
+    """Plot full-range E_theta and E_phi radial cuts in two stacked panels."""
     curves = _extract_1d_radial_curves(results_dir, config, case_name)
-    r_norm = curves["r_norm"]
-    target = curves["target"]
-    sie = curves["sie"]
-    svwf = curves["svwf"]
-    comsol = curves["comsol"]
-    has_svwf = curves["has_svwf"]
-    has_comsol = curves["has_comsol"]
+    fig, axes = plt.subplots(2, 1, figsize=(3.5, 4.5), sharex=True, constrained_layout=True)
+    for component, ax in enumerate(axes):
+        _plot_radial_component(ax, curves, component)
+        ax.set_title(("(a) Theta component", "(b) Phi component")[component], pad=3)
 
-    mask = r_norm >= 0.1
-    r_v = r_norm[mask]
-    target_v = target[mask]
-    sie_v = sie[mask]
-    svwf_v = svwf[mask] if has_svwf else None
-
-    fig, ax = plt.subplots(figsize=(3.4, 2.4), constrained_layout=True)
-
-    ax.plot(r_v, target_v / 1e5, color="black", linestyle="-", linewidth=1.2, label="Target (Prescribed)")
-    ax.plot(r_v, sie_v / 1e5, color="#ff7f0e", linestyle="--", linewidth=1.1, label="SIE-GSTC (MoM)")
-    if has_svwf:
-        ax.plot(r_v, svwf_v / 1e5, color="#2ca02c", linestyle=":", linewidth=1.1, label="SVWF Collocation")
-    if has_comsol:
-        mask_c = curves["r_norm_comsol"] >= 0.1
-        ax.plot(curves["r_norm_comsol"][mask_c], comsol[mask_c] / 1e5, color="#1f77b4", linestyle="-.", linewidth=1.0, label="COMSOL (FEM)")
-
-    ax.axvline(x=1.0, color="red", linestyle="--", linewidth=0.8, alpha=0.8)
-
-    if case_name == "electric_incidence":
-        y_label = r"$\mathrm{Re}(E) \times 10^5$ [V/m]"
-        badge_int = r"Interior: $\mathrm{Re}(E_\theta)$ [TM]"
-        badge_ext = r"Exterior: $\mathrm{Re}(E_\phi)$ [TE]"
-        ax.set_ylim(-8.0, 18.0)
-    else:
-        y_label = r"$\mathrm{Re}(E) \times 10^5$ [V/m]"
-        badge_int = r"Interior: $\mathrm{Re}(E_\phi)$ [TE]"
-        badge_ext = r"Exterior: $\mathrm{Re}(E_\theta)$ [TM]"
-        ax.set_ylim(-30.0, 10.0)
-
-    ax.text(0.55, 0.90, badge_int, transform=ax.transAxes, fontsize=6.5, color="#333333", ha="right",
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="#f0f0f0", edgecolor="none", alpha=0.8))
-    ax.text(0.98, 0.90, badge_ext, transform=ax.transAxes, fontsize=6.5, color="#333333", ha="right",
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="#f0f0f0", edgecolor="none", alpha=0.8))
-
-    ax.set_xlabel(r"Normalized Radius $r/a$")
-    ax.set_ylabel(y_label)
-    ax.set_xlim(0.1, 2.0)
-    ax.legend(loc="lower right", frameon=True, framealpha=0.9, edgecolor="none", fontsize=6.5)
-    ax.grid(True, linestyle=":", alpha=0.6)
+    axes[-1].set_xlabel(r"Normalized Radial Distance $r/a$")
+    incidence = "Electric incidence" if case_name == "electric_incidence" else "Magnetic incidence"
+    fig.suptitle(incidence + r" ($\theta = 45^\circ,\ \phi = 0^\circ$)", fontsize=9)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="outside lower center", ncol=2, frameon=False, fontsize=6.5)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     prefix = f"figure_2_part_b_{case_name}"
@@ -501,51 +458,35 @@ def plot_single_case_1d_radial_cut(
     return pdf_path, png_path
 
 
-def plot_combined_2panel_1d_radial_cut(
+def plot_combined_4panel_1d_radial_cut(
     results_dir: Path,
     config: object,
     output_dir: Path,
     *,
     dpi: int = 300,
 ) -> tuple[Path, Path]:
-    """Plot side-by-side 2-panel 1D radial cut comparison for both cases (3.5 in single column or 7.1 in double)."""
+    """Plot theta/phi components as rows and electric/magnetic incidence as columns."""
     curves1 = _extract_1d_radial_curves(results_dir, config, "electric_incidence")
     curves2 = _extract_1d_radial_curves(results_dir, config, "magnetic_incidence")
+    fig, axes = plt.subplots(2, 2, figsize=(7.1, 4.5), sharex=True, constrained_layout=True)
 
-    fig, axes = plt.subplots(1, 2, figsize=(7.1, 2.6), constrained_layout=True)
+    for column, (curves, incidence) in enumerate(((curves1, "Electric incidence"),
+                                                (curves2, "Magnetic incidence"))):
+        for component in range(2):
+            ax = axes[component, column]
+            _plot_radial_component(ax, curves, component)
+            panel = "abcd"[2 * component + column]
+            field = (r"$E_\theta$", r"$E_\phi$")[component]
+            ax.set_title(f"({panel}) {incidence}: {field}", pad=3)
+        axes[-1, column].set_xlabel(r"Normalized Radial Distance $r/a$")
 
-    cases_info = [
-        (axes[0], curves1, r"(a) Case 1: Electric Inc. ($\mathbf{p} \to \mathbf{m}$)",
-         r"Int: $\mathrm{Re}(E_\theta)$ [TM]", r"Ext: $\mathrm{Re}(E_\phi)$ [TE]", (-8.0, 18.0)),
-        (axes[1], curves2, r"(b) Case 2: Magnetic Inc. ($\mathbf{m} \to \mathbf{p}$)",
-         r"Int: $\mathrm{Re}(E_\phi)$ [TE]", r"Ext: $\mathrm{Re}(E_\theta)$ [TM]", (-30.0, 10.0)),
-    ]
-
-    for ax, c, title, badge_int, badge_ext, ylim in cases_info:
-        mask = c["r_norm"] >= 0.1
-        r_v = c["r_norm"][mask]
-        ax.plot(r_v, c["target"][mask] / 1e5, color="black", linestyle="-", linewidth=1.2, label="Target (Prescribed)")
-        ax.plot(r_v, c["sie"][mask] / 1e5, color="#ff7f0e", linestyle="--", linewidth=1.1, label="SIE-GSTC (MoM)")
-        if c["has_svwf"]:
-            ax.plot(r_v, c["svwf"][mask] / 1e5, color="#2ca02c", linestyle=":", linewidth=1.1, label="SVWF Collocation")
-        if c["has_comsol"]:
-            mask_c = c["r_norm_comsol"] >= 0.1
-            ax.plot(c["r_norm_comsol"][mask_c], c["comsol"][mask_c] / 1e5, color="#1f77b4", linestyle="-.", linewidth=1.0, label="COMSOL (FEM)")
-
-        ax.axvline(x=1.0, color="red", linestyle="--", linewidth=0.8, alpha=0.8)
-        ax.set_title(title, pad=3)
-        ax.set_xlabel(r"Normalized Radius $r/a$")
-        ax.set_ylabel(r"$\mathrm{Re}(E) \times 10^5$ [V/m]")
-        ax.set_xlim(0.1, 2.0)
-        ax.set_ylim(ylim)
-        ax.grid(True, linestyle=":", alpha=0.6)
-
-        ax.text(0.55, 0.90, badge_int, transform=ax.transAxes, fontsize=6.5, color="#333333", ha="right",
-                bbox=dict(boxstyle="round,pad=0.2", facecolor="#f0f0f0", edgecolor="none", alpha=0.8))
-        ax.text(0.98, 0.90, badge_ext, transform=ax.transAxes, fontsize=6.5, color="#333333", ha="right",
-                bbox=dict(boxstyle="round,pad=0.2", facecolor="#f0f0f0", edgecolor="none", alpha=0.8))
-
-    axes[1].legend(loc="lower right", frameon=True, framealpha=0.9, edgecolor="none", fontsize=6.5)
+    fig.suptitle(r"Radial fields ($\theta = 45^\circ,\ \phi = 0^\circ$)", fontsize=9)
+    legend_entries = {}
+    for ax in axes.flat:
+        handles, labels = ax.get_legend_handles_labels()
+        legend_entries.update(zip(labels, handles))
+    fig.legend(legend_entries.values(), legend_entries.keys(), loc="outside lower center",
+               ncol=len(legend_entries), frameon=False, fontsize=6.5)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     pdf_path = output_dir / "figure_2_part_b_radial_cut_transformation.pdf"
@@ -661,7 +602,7 @@ def main() -> int:
         plot_single_case_1d_radial_cut(args.results_dir, cfg, args.output_dir, "magnetic_incidence", dpi=args.dpi)
     if (args.results_dir / "cases" / "electric_incidence" / "fields" / "sie_physical_radial.csv").is_file() and \
        (args.results_dir / "cases" / "magnetic_incidence" / "fields" / "sie_physical_radial.csv").is_file():
-        plot_combined_2panel_1d_radial_cut(args.results_dir, cfg, args.output_dir, dpi=args.dpi)
+        plot_combined_4panel_1d_radial_cut(args.results_dir, cfg, args.output_dir, dpi=args.dpi)
 
     print("\n==================================================================")
     print(" All Example 2 Part B Publication Figures Successfully Generated!")

@@ -11,7 +11,7 @@ Usage:
   .venv/bin/python applications/anisotropic_gstc_sphere/publication/run_example_2_part_a.py [options]
 
 Options:
-  --plots-only        Skip solver runs and regenerate figures from existing results.
+  --plots-only        Skip C++ solve; ensure SVWF data and regenerate figures from existing SIE results.
   --force             Delete existing simulation results and re-run C++ SIE solve from scratch.
   --vmin-db           Colorbar minimum in normalized dB (default: -112.0).
   --vmax-db           Colorbar maximum in normalized dB (default: -58.0).
@@ -183,7 +183,7 @@ def main() -> int:
     parser.add_argument(
         "--plots-only",
         action="store_true",
-        help="Skip C++ SIE solve and regenerate plots from existing data",
+        help="Skip C++ SIE solve; generate missing SVWF benchmarks and regenerate figures from existing SIE results",
     )
     parser.add_argument(
         "--force",

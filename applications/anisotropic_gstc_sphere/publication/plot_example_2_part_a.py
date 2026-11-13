@@ -10,9 +10,9 @@ Generates:
      - Panel (a): |E_theta| in dB [TM mode: active interior dipole, extinguished exterior].
      - Panel (b): |E_phi| in dB [TE mode: extinguished interior, active exterior magnetic donut].
      - Side-by-side single-column layout (3.5 in) with shared colorbar [105, 150] dB.
-  2. Figure 2: 1D radial cut piecewise transformation along theta = 45 deg, phi = 0 deg
-     - r/a <= 1.0: Re(E_theta) (dominant TM mode).
-     - r/a > 1.0:  Re(E_phi)   (dominant TE mode).
+  2. Figure 2: Stacked radial cuts along theta = 45 deg, phi = 0 deg
+     - Top: Re(E_theta) across the full radial range.
+     - Bottom: Re(E_phi) across the full radial range.
      - Comparison across Prescribed Target, SIE-GSTC (MoM), and SVWF Collocation.
 
 Designed for IEEE journal two-column formatting (3.5 in column width).
@@ -239,7 +239,7 @@ def plot_figure_2_1d_radial_cut(
     *,
     dpi: int = 300,
 ) -> tuple[Path, Path]:
-    """Plot 1D radial cut piecewise transformation comparing Target, SIE, SVWF, and COMSOL."""
+    """Plot full-range E_theta and E_phi radial cuts in two stacked panels."""
     radius_m = config.case.radius_m
     fields_dir = results_dir / "cases" / case_name / "fields"
     sie_csv = fields_dir / "sie_physical_radial.csv"
@@ -276,8 +276,10 @@ def plot_figure_2_1d_radial_cut(
     E_ext_pre, _ = evaluate_prescribed_fields(
         ref_ext, "exterior", config, radius=r_pts, theta=th_r, phi=ph_r
     )
-    E_th_pre = E_int_pre[1]
-    E_ph_pre = E_ext_pre[2]
+    # Each component uses the prescribed field of its own region.
+    interior = r_norm <= 1.0
+    E_th_pre = np.where(interior, E_int_pre[1], E_ext_pre[1])
+    E_ph_pre = np.where(interior, E_int_pre[2], E_ext_pre[2])
 
     # 3. SVWF field if available
     has_svwf = svwf_csv.is_file()
@@ -320,91 +322,41 @@ def plot_figure_2_1d_radial_cut(
     }
     scale = budhu_moment_scale(manifest)
 
-    # Build piecewise curves: r <= a -> E_theta [TM], r > a -> E_phi [TE]
-    E_sie_pw = np.where(r_norm <= 1.0, E_th_sie, E_ph_sie)
-    E_pre_pw = np.where(r_norm <= 1.0, E_th_pre, E_ph_pre)
+    # Limit the data as well as the axis so hidden near-source samples do not set the y range.
+    visible = (r_norm >= 0.1) & (r_norm <= 2.0)
+    r_plot = r_norm[visible]
 
-    e_sie_re = np.real(scale * E_sie_pw) / 1e5
-    e_pre_re = np.real(scale * E_pre_pw) / 1e5
-
-    if has_svwf:
-        E_svwf_pw = np.where(r_norm <= 1.0, E_th_svwf, E_ph_svwf)
-        e_svwf_re = np.real(scale * E_svwf_pw) / 1e5
-
-    if has_comsol:
-        E_com_pw = np.where(r_norm <= 1.0, E_th_com, E_ph_com)
-        e_com_re = np.real(E_com_pw) / 1e5
-
-    # Single-column figure (3.4 in x 2.4 in)
-    fig, ax = plt.subplots(figsize=(3.4, 2.4), constrained_layout=True)
-
-    # Plot curves
-    ax.plot(
-        r_norm,
-        e_pre_re,
-        label="Prescribed Target",
-        color="black",
-        linestyle="-",
-        linewidth=1.4,
+    # One component per panel, each spanning the interior and exterior.
+    fig, axes = plt.subplots(2, 1, figsize=(3.5, 4.5), sharex=True, constrained_layout=True)
+    components = (
+        (E_th_pre, E_th_sie, E_th_svwf if has_svwf else None,
+         E_th_com if has_comsol else None, r"$\mathrm{Re}(E_\theta)$ [$10^5$ V/m]", "(a) Theta component"),
+        (E_ph_pre, E_ph_sie, E_ph_svwf if has_svwf else None,
+         E_ph_com if has_comsol else None, r"$\mathrm{Re}(E_\phi)$ [$10^5$ V/m]", "(b) Phi component"),
     )
-    ax.plot(
-        r_norm,
-        e_sie_re,
-        label="SIE-GSTC (MoM)",
-        color="#d95f02",
-        linestyle="--",
-        linewidth=1.2,
-    )
-    if has_svwf:
-        ax.plot(
-            r_norm,
-            e_svwf_re,
-            label="SVWF Collocation",
-            color="#1b9e77",
-            linestyle=":",
-            linewidth=1.3,
-        )
-    if has_comsol:
-        ax.plot(
-            r_norm,
-            e_com_re,
-            label="COMSOL (FEM)",
-            color="#7570b3",
-            linestyle="-.",
-            linewidth=1.0,
-        )
+    for ax, (target, sie, svwf, comsol, ylabel, title) in zip(axes, components):
+        ax.plot(r_plot, np.real(scale * target[visible]) / 1e5,
+                color="black", linestyle="--", linewidth=1.0, label="Prescribed Target")
+        ax.plot(r_plot, np.real(scale * sie[visible]) / 1e5,
+                color="#d95f02", linestyle="none", marker="o", markevery=(0, 10),
+                markersize=3.0, markerfacecolor="none", markeredgewidth=0.8, label="SIE-GSTC (MoM)")
+        if has_svwf:
+            ax.plot(r_plot, np.real(scale * svwf[visible]) / 1e5,
+                    color="#1b9e77", linestyle="none", marker="^", markevery=(5, 24),
+                    markersize=3.0, markerfacecolor="none", markeredgewidth=0.8, label="SVWF Collocation")
+        if has_comsol:
+            ax.plot(r_plot, np.real(comsol[visible]) / 1e5,
+                    color="#0072B2", linestyle="-.", linewidth=0.8, label="COMSOL (FEM)")
+        ax.axvline(1.0, color="#e41a1c", linestyle="--", linewidth=0.8, alpha=0.7)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title, pad=3)
+        ax.set_xlim(0.1, 2.0)
+        ax.grid(True, linestyle=":", alpha=0.6)
 
-    # Metasurface interface indicator
-    ax.axvline(1.0, color="#e41a1c", linestyle="--", linewidth=0.8, alpha=0.7)
-
-    # Region label badges
-    ax.text(
-        0.55,
-        0.08,
-        r"Interior: $\mathrm{Re}(E_\theta)$ [TM]",
-        transform=ax.get_xaxis_transform(),
-        ha="center",
-        fontsize=6.5,
-        color="#333333",
-        bbox=dict(boxstyle="square,pad=0.2", facecolor="white", edgecolor="none", alpha=0.7),
-    )
-    ax.text(
-        1.50,
-        0.08,
-        r"Exterior: $\mathrm{Re}(E_\phi)$ [TE]",
-        transform=ax.get_xaxis_transform(),
-        ha="center",
-        fontsize=6.5,
-        color="#333333",
-        bbox=dict(boxstyle="square,pad=0.2", facecolor="white", edgecolor="none", alpha=0.7),
-    )
-
-    ax.set_xlabel(r"Normalized Radial Distance $r/a$")
-    ax.set_ylabel(r"$\mathrm{Re}(E) \times 10^5$ [V/m]")
-    ax.set_xlim(0.1, 2.0)
-    ax.set_title(r"Radial Field Transformation ($\theta = 45^\circ, \phi = 0^\circ$)", pad=3)
-    ax.grid(True, linestyle=":", alpha=0.6)
-    ax.legend(frameon=True, facecolor="white", framealpha=0.9, edgecolor="none", loc="upper right")
+    axes[-1].set_xlabel(r"Normalized Radial Distance $r/a$")
+    fig.suptitle(r"Radial fields ($\theta = 45^\circ,\ \phi = 0^\circ$)", fontsize=9)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="outside lower center", ncol=2, frameon=False, fontsize=6.5)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     pdf_path = output_dir / "figure_2_part_a_radial_cut_transformation.pdf"

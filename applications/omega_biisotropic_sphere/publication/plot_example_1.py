@@ -254,12 +254,17 @@ def plot_figure_2_1d_radial_cut(
     # Single-column width figure (3.4 in x 2.4 in)
     fig, ax = plt.subplots(figsize=(3.4, 2.4), constrained_layout=True)
 
-    # Plot curves
-    ax.plot(r_pre, e_pre_re, label="Prescribed Target", color="black", linestyle="-", linewidth=1.4)
-    ax.plot(r_sie, e_sie_re, label="SIE-GSTC (MoM)", color="#d95f02", linestyle="--", linewidth=1.2)
-    ax.plot(r_svwf, e_svwf_re, label="SVWF Collocation", color="#1b9e77", linestyle=":", linewidth=1.2)
+    # Sparse SIE circles show agreement without adding another overlapping line.
+    ax.plot(r_pre, e_pre_re, label="Prescribed Target", color="black", linestyle="--", linewidth=1.0)
+    ax.plot(
+        r_sie, e_sie_re, label="SIE-GSTC (MoM)", color="#d95f02", linestyle="none",
+        marker="o", markevery=(0, 10), markersize=3.0, markerfacecolor="none", markeredgewidth=0.8,
+    )
+    # Start at index 5 and step by 24: these odd indices never coincide with SIE's multiples of 10.
+    ax.plot(r_svwf, e_svwf_re, label="SVWF Collocation", color="#1b9e77", linestyle="none",
+        marker="^", markevery=(5, 24), markersize=3.0, markerfacecolor="none", markeredgewidth=0.8)
     if has_comsol:
-        ax.plot(r_com, e_com_re, label="COMSOL (FEM)", color="#7570b3", linestyle="-.", linewidth=1.0)
+        ax.plot(r_com, e_com_re, label="COMSOL (FEM)", color="#0072B2", linestyle="-.", linewidth=0.8)
 
     # Metasurface interface indicator
     ax.axvline(1.0, color="#e41a1c", linestyle="--", linewidth=0.8, alpha=0.7)

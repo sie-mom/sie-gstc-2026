@@ -41,7 +41,7 @@ All figures are pre-compiled in vector PDF format in `applications/anisotropic_g
 | **Part B (Option 1)** | `figures/figure_1_part_b_magnetic_incidence_2d_field_maps.pdf` | `figures/figure_example_2_part_b_case2_2d_maps.pdf` | 2D Field Maps (Case 2: $\text{TE} \to \text{TM}$) |
 | **Part B (Option 1)** | `figures/figure_2_part_b_magnetic_incidence_radial_cut.pdf` | `figures/figure_example_2_part_b_case2_radial_cut.pdf` | 1D Radial Cut (Case 2: $\text{TE} \to \text{TM}$) |
 | **Part B (Option 2)** | `figures/figure_1_part_b_combined_2d_field_maps.pdf` | `figures/figure_example_2_part_b_combined_2d_maps.pdf` | 4-panel 2D Dual Duality Comparison |
-| **Part B (Option 2)** | `figures/figure_2_part_b_radial_cut_transformation.pdf` | `figures/figure_example_2_part_b_combined_radial_cut.pdf` | 2-panel 1D Radial Cut Comparison |
+| **Part B (Option 2)** | `figures/figure_2_part_b_radial_cut_transformation.pdf` | `figures/figure_example_2_part_b_combined_radial_cut.pdf` | 4-panel full-component Radial Cut Comparison |
 | **Part B (Ref)** | `figures/figure_1_part_b_electric_incidence_2d_field_maps.pdf` | `figures/figure_example_2_part_b_case1_2d_maps.pdf` | 2D Field Maps (Case 1 for Part B) |
 | **Part B (Ref)** | `figures/figure_2_part_b_electric_incidence_radial_cut.pdf` | `figures/figure_example_2_part_b_case1_radial_cut.pdf` | 1D Radial Cut (Case 1 for Part B) |
 
@@ -68,7 +68,7 @@ All figures are pre-compiled in vector PDF format in `applications/anisotropic_g
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figures/figure_example_2_part_a_radial_cut.pdf}
-\caption{Example~2 (Part~A): Radial cut along $(\theta = 45^\circ, \phi = 0^\circ)$ showing the piecewise physical transformation from an interior electric dipole ($\operatorname{Re}(E_\theta)$ for $r/a \le 1.0$) to exterior magnetic dipole radiation ($\operatorname{Re}(E_\phi)$ for $r/a > 1.0$). Curves compare the analytical prescribed target (solid black), numerical SIE-GSTC MoM solution (dashed orange), and independent Spherical Vector Wave Function (SVWF) modal collocation benchmark (dotted green). The relative discrepancy across all points is below $0.7\%$.}
+\caption{Example~2 (Part~A): Radial cut along $(\theta = 45^\circ, \phi = 0^\circ)$. (a)~$\operatorname{Re}(E_\theta)$ and (b)~$\operatorname{Re}(E_\phi)$ are shown across both the interior and exterior, displaying the electric-to-magnetic polarization transformation and suppression of the unwanted component. Curves compare the analytical prescribed target (dashed black), numerical SIE-GSTC MoM solution (orange circles), and independent SVWF collocation benchmark (green triangles). The red dashed line marks the metasurface at $r/a=1$.}
 \label{fig:example_2_part_a_radial_cut}
 \end{figure}
 ```
@@ -92,7 +92,7 @@ All figures are pre-compiled in vector PDF format in `applications/anisotropic_g
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figures/figure_example_2_part_b_case2_radial_cut.pdf}
-\caption{Example~2 (Part~B): Radial cut along $(\theta = 45^\circ, \phi = 0^\circ)$ for the magnetic-incidence state ($r/a \in [0.1, 2.0]$), showing the piecewise transformation from interior magnetic dipole ($\operatorname{Re}(E_\phi)$ for $r/a \le 1.0$) to exterior electric dipole radiation ($\operatorname{Re}(E_\theta)$ for $r/a > 1.0$). Numerical SIE-GSTC MoM (dashed orange) matches the analytical target (solid black) and independent SVWF modal benchmark (dotted green) with mean relative discrepancy below $0.85\%$.}
+\caption{Example~2 (Part~B): Radial cut along $(\theta = 45^\circ, \phi = 0^\circ)$ for the magnetic-incidence state. (a)~$\operatorname{Re}(E_\theta)$ and (b)~$\operatorname{Re}(E_\phi)$ are shown over $r/a\in[0.1,2.0]$, displaying the magnetic-to-electric polarization transformation and suppression of the unwanted component. The SIE-GSTC MoM solution (orange circles) and independent SVWF collocation benchmark (green triangles) are compared with the analytical prescribed target (dashed black). The red dashed line marks the metasurface at $r/a=1$.}
 \label{fig:example_2_part_b_case2_radial_cut}
 \end{figure}
 ```
@@ -111,12 +111,12 @@ All figures are pre-compiled in vector PDF format in `applications/anisotropic_g
 \end{figure*}
 ```
 
-#### Part B (Option 2): Figure 4 (2-Panel 1D Radial Cut Duality)
+#### Part B (Option 2): Figure 4 (4-Panel 1D Radial Cut Duality)
 ```latex
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{figures/figure_example_2_part_b_combined_radial_cut.pdf}
-\caption{Example~2 (Part~B): Piecewise radial field distribution along $(\theta = 45^\circ, \phi = 0^\circ)$ demonstrating bidirectional polarization conversion. (a)~Case~1: Electric incidence ($\mathbf{p} \to \mathbf{m}$), transitioning from $\operatorname{Re}(E_\theta)$ [TM] inside to $\operatorname{Re}(E_\phi)$ [TE] outside. (b)~Case~2: Magnetic incidence ($\mathbf{m} \to \mathbf{p}$), transitioning from $\operatorname{Re}(E_\phi)$ [TE] inside to $\operatorname{Re}(E_\theta)$ [TM] outside. In both cases, SIE-GSTC MoM (dashed orange) perfectly tracks the analytical target (solid black) and independent SVWF modal benchmark (dotted green).}
+\caption{Example~2 (Part~B): Radial field components along $(\theta = 45^\circ, \phi = 0^\circ)$ for both transformations. Left column: electric incidence ($\mathbf{p}\to\mathbf{m}$). Right column: magnetic incidence ($\mathbf{m}\to\mathbf{p}$). The top row shows $\operatorname{Re}(E_\theta)$ and the bottom row shows $\operatorname{Re}(E_\phi)$, each across the full interior and exterior cut, retaining the computed residuals in the suppression regions. The SIE-GSTC MoM solution (orange circles) and SVWF collocation benchmark (green triangles) are compared with the analytical prescribed target (dashed black). The red dashed line marks $r/a=1$.}
 \label{fig:example_2_part_b_combined_radial_cut}
 \end{figure*}
 ```
